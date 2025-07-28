@@ -5,49 +5,71 @@ const clientes = document.getElementById("listaClientes");
 function adicionarCliente(cliente) {
     const item = document.createElement("li");
     item.setAttribute("data-id", cliente._id);
-    item.innerHTML = `${cliente.nome} <button class="ali" onclick="update('${cliente._id}')">Atualizar</button><button class="ale" onclick="remove('${cliente._id}')">X</button>`;
+    item.innerHTML = `
+        Nome:${cliente.nome} - Email:${cliente.email}
+        <button class="ali" onclick="update('${cliente._id}')">Atualizar</button>
+        <button class="ale" onclick="remove('${cliente._id}')">X</button>
+    `;
     clientes.appendChild(item);
 }
 //
-document.getElementById("list").addEventListener("click",function listarClientes() {
-    fetch("https://crudcrud.com/api/b4538486b8f84c7a88de788b5fd97ec6/cliente")
+document.getElementById("list").addEventListener("click", function listarClientes() {
+    fetch("https://crudcrud.com/api/6eb0549a24894558bb8eeaa626923ca0/cliente")
         .then(resposta => resposta.json())
         .then((listaDeClientes) => {
-            // Limpa a lista antes de adicionar os itens
             clientes.innerHTML = '';
             listaDeClientes.forEach(cliente => {
-                adicionarCliente(cliente);
+                adicionarCliente(cliente); // Usar a nova função aqui
             });
         })
         .catch(error => console.error("Erro ao carregar clientes:", error));
-})
+});
 // Adiciona um ouvinte de evento click no botão "adicionar"
 document.getElementById("add").addEventListener("click", () => {
-    const nome = document.getElementById("cliente").value;
-    if (!nome.trim()) {
+    const nome = document.getElementById("cliente").value.trim();
+    const email = document.getElementById("email").value.trim();
+    
+    // Validação dos campos
+    if (!nome) {
         alert("Por favor, digite um nome para o cliente!");
         return;
     }
+    
+    if (!email) {
+        alert("Por favor, digite um email válido para o cliente!");
+        return;
+    }
+    
+    // Validação simples de formato de email
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        alert("Por favor, digite um email válido!");
+        return;
+    }
 
-    fetch("https://crudcrud.com/api/b4538486b8f84c7a88de788b5fd97ec6/cliente", {
+    fetch("https://crudcrud.com/api/6eb0549a24894558bb8eeaa626923ca0/cliente", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ nome: nome })
+        body: JSON.stringify({ 
+            nome: nome,
+            email: email 
+        })
     })
     .then(resposta => resposta.json())
     .then(() => {
-    // Apenas limpa o campo, não adiciona à lista
-    document.getElementById("cliente").value = '';
-    alert("Cliente adicionado com sucesso!");
-})
+        document.getElementById("cliente").value = '';
+        document.getElementById("email").value = '';
+        alert("Cliente adicionado com sucesso!");
+        // Dispara o evento de listagem para atualizar a lista
+        document.getElementById("list").click();
+    })
     .catch(error => console.error("Erro ao adicionar cliente:", error));
 });
 
 async function remove(clienteId) {
     try {
-        const response = await fetch(`https://crudcrud.com/api/b4538486b8f84c7a88de788b5fd97ec6/cliente/${clienteId}`, {
+        const response = await fetch(`https://crudcrud.com/api/6eb0549a24894558bb8eeaa626923ca0/cliente/${clienteId}`, {
             method: "DELETE"
         });
         
@@ -62,27 +84,38 @@ async function remove(clienteId) {
         alert("Erro ao remover cliente");
     }
 }
-// Função para editar o nome de um cliente
+// Função para atualizar um cliente
 async function update(clienteId) {
     const novoNome = prompt("Digite o novo nome do cliente:");
-    
     if (!novoNome || !novoNome.trim()) {
         alert("O nome não pode estar vazio!");
         return;
     }
+    
+    const novoEmail = prompt("Digite o novo email do cliente:");
+    if (!novoEmail || !novoEmail.trim()) {
+        alert("O email não pode estar vazio!");
+        return;
+    }
+    
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(novoEmail)) {
+        alert("Por favor, digite um email válido!");
+        return;
+    }
 
     try {
-        const response = await fetch(`https://crudcrud.com/api/b4538486b8f84c7a88de788b5fd97ec6/cliente/${clienteId}`, {
+        const response = await fetch(`https://crudcrud.com/api/6eb0549a24894558bb8eeaa626923ca0/cliente/${clienteId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ nome: novoNome.trim() })
+            body: JSON.stringify({ 
+                nome: novoNome.trim(),
+                email: novoEmail.trim()
+            })
         });
 
         if (!response.ok) throw new Error("Erro ao atualizar cliente");
-
-        // Atualiza a lista completa após a edição
         document.getElementById("list").click();
         
     } catch (error) {
