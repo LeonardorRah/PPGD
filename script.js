@@ -61,8 +61,6 @@ document.getElementById("add").addEventListener("click", () => {
         document.getElementById("cliente").value = '';
         document.getElementById("email").value = '';
         alert("Cliente adicionado com sucesso!");
-        // Dispara o evento de listagem para atualizar a lista
-        document.getElementById("list").click();
     })
     .catch(error => console.error("Erro ao adicionar cliente:", error));
 });
