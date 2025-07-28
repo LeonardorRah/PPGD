@@ -58,10 +58,10 @@ document.getElementById("add").addEventListener("click", () => {
     })
     .then(resposta => resposta.json())
     .then(() => {
-        document.getElementById("cliente").value = '';
-        document.getElementById("email").value = '';
-        alert("Cliente adicionado com sucesso!");
-    })
+    document.getElementById("cliente").value = '';
+    document.getElementById("email").value = '';
+    alert("Cliente adicionado com sucesso!");
+})
     .catch(error => console.error("Erro ao adicionar cliente:", error));
 });
 
